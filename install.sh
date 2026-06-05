@@ -9,7 +9,7 @@ RAW_BASE="${OPNDF_RAW_BASE:-https://raw.githubusercontent.com/${REPO_OWNER}/${RE
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 LOCAL_INSTALLER="${SCRIPT_DIR}/Scripts/install.sh"
 
-if [[ -s "${LOCAL_INSTALLER}" ]]; then
+if [[ "${OPNDF_USE_LOCAL_INSTALLER:-}" == "1" && -s "${LOCAL_INSTALLER}" ]]; then
   exec bash "${LOCAL_INSTALLER}" "$@"
 fi
 
