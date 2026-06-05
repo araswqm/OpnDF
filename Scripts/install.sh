@@ -377,7 +377,7 @@ try_download_pdf() {
 
   for remote_path in "${candidates[@]}"; do
     rm -f "${tmp}"
-    if download_to "${remote_path}" "${tmp}" 2>/dev/null && [[ -s "${tmp}" ]]; then
+    if download_to "${remote_path}" "${tmp}" 2>/dev/null && [[ -f "${tmp}" ]]; then
       mv "${tmp}" "${destination}"
       return 0
     fi
