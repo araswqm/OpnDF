@@ -56,6 +56,9 @@
       { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Tarih", "ogretmen": "Nazife Kutgunay Yıldırım" },
       { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Matematik 9", "ogretmen": "Saadet Cicikçioğlu" },
       { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Seçmeli Düşünme Eğitimi", "ogretmen": "Seval Buldağ" }
+    ],
+    "Cumartesi": [
+      { "baslangic": "00:00", "bitis": "23:59", "ders_adi": "Atölye", "ogretmen": "Test Öğretmeni" }
     ]
   }
 }
