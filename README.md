@@ -18,7 +18,14 @@ bash install.sh
 ```
 
 Kurulum betiği GUI için sırasıyla `zenity`, `yad` veya `kdialog` arar. Bunlar
-yoksa aynı seçimleri terminal üzerinden alır.
+yoksa tarayıcıda yerel bir kurulum sihirbazı açar; tarayıcı otomatik açılmazsa
+terminalde verilen `http://127.0.0.1:...` adresi elle açılabilir.
+
+Tamamen terminal üzerinden seçim yapmak için:
+
+```bash
+OPNDF_NO_GUI=1 bash install.sh
+```
 
 ## Oluşturulan Dosyalar
 
@@ -66,7 +73,7 @@ XDG autostart ortamlarında `.desktop` uzantısı daha güvenilir çalışır.
         "baslangic": "08:15",
         "bitis": "08:45",
         "ders_adi": "Matematik 10",
-        "ogretmen": "Benay Kaplan Samuroğlu"
+        "ogretmen": "Mehmet Yılmaz"
       }
     ]
   }

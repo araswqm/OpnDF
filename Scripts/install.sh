@@ -129,6 +129,526 @@ ui_yes_no() {
   esac
 }
 
+should_use_web_wizard() {
+  [[ -n "${OPNDF_NO_GUI:-}" ]] && return 1
+  [[ "${OPNDF_WEB_UI:-}" == "0" ]] && return 1
+  [[ "${OPNDF_WEB_UI:-}" == "1" ]] && return 0
+  [[ "${UI_BACKEND}" == "terminal" ]]
+}
+
+run_web_setup() {
+  local manifest_file="$1"
+  local result_file
+  result_file="$(mktemp -t opndf-web-setup.XXXXXX.env)"
+
+  if python3 - "${manifest_file}" "${result_file}" <<'PY'
+import html
+import json
+import os
+import shlex
+import sys
+import time
+import webbrowser
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+manifest_path = sys.argv[1]
+result_path = sys.argv[2]
+
+with open(manifest_path, "r", encoding="utf-8") as handle:
+    manifest = json.load(handle)
+
+
+def env_bool(name, default):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.lower() in {"1", "true", "yes", "y", "e", "evet"}
+
+
+defaults = {
+    "department": os.environ.get("OPNDF_DEPARTMENT", ""),
+    "grade": os.environ.get("OPNDF_GRADE", ""),
+    "section": os.environ.get("OPNDF_SECTION", ""),
+    "autoStart": env_bool("OPNDF_AUTO_START", True),
+    "sendNotifications": env_bool("OPNDF_SEND_NOTIFICATIONS", True),
+}
+
+
+def find_department(dep_id):
+    for department in manifest.get("departments", []):
+        if department.get("id") == dep_id:
+            return department
+    return None
+
+
+def find_grade(department, grade_id):
+    for grade in department.get("grades", []):
+        if grade.get("id") == grade_id:
+            return grade
+    return None
+
+
+def write_result(payload):
+    dep_id = str(payload.get("department", "")).strip()
+    grade_id = str(payload.get("grade", "")).strip()
+    section_id = str(payload.get("section", "")).strip()
+    department = find_department(dep_id)
+    if not department:
+        raise ValueError("Bölüm bulunamadı.")
+    grade = find_grade(department, grade_id)
+    if not grade:
+        raise ValueError("Sınıf bulunamadı.")
+
+    valid_sections = {str(section.get("id", "")) for section in grade.get("sections", [])}
+    if section_id not in valid_sections:
+        raise ValueError("Şube bulunamadı.")
+
+    values = {
+        "DEPARTMENT": dep_id,
+        "GRADE": grade_id,
+        "SECTION": section_id,
+        "AUTO_START": "true" if bool(payload.get("autoStart")) else "false",
+        "SEND_NOTIFICATIONS": "true" if bool(payload.get("sendNotifications")) else "false",
+    }
+    with open(result_path, "w", encoding="utf-8") as handle:
+        for key, value in values.items():
+            handle.write(f"{key}={shlex.quote(value)}\n")
+
+
+def page(title, body):
+    return f"""<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{html.escape(title)}</title>
+  <style>
+    :root {{
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5f6b7d;
+      --line: #d9e1ea;
+      --paper: #f7f9fc;
+      --white: #ffffff;
+      --teal: #0f766e;
+      --blue: #2563eb;
+      --red: #b42318;
+      --shadow: 0 18px 45px rgba(23, 32, 51, 0.12);
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.10), transparent 38%),
+        linear-gradient(315deg, rgba(37, 99, 235, 0.10), transparent 42%),
+        var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }}
+    main {{
+      width: min(760px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background: rgba(255, 255, 255, 0.96);
+      overflow: hidden;
+    }}
+    header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--line);
+    }}
+    .brand {{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+    }}
+    .mark {{
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: var(--white);
+      font-size: 13px;
+      letter-spacing: 0;
+    }}
+    .status {{
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+    }}
+    form, .message {{
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }}
+    .intro {{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }}
+    .grid {{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }}
+    label {{
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }}
+    select {{
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: var(--white);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+    }}
+    .toggles {{
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+    }}
+    .toggle {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 750;
+    }}
+    .toggle input {{
+      width: 20px;
+      height: 20px;
+      accent-color: var(--teal);
+      flex: 0 0 auto;
+    }}
+    .actions {{
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+    }}
+    button {{
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 0 18px;
+      cursor: pointer;
+      background: var(--teal);
+      color: var(--white);
+      font: inherit;
+      font-weight: 800;
+    }}
+    button.secondary {{
+      background: var(--white);
+      border-color: var(--line);
+      color: var(--ink);
+    }}
+    .error {{
+      min-height: 22px;
+      color: var(--red);
+      font-weight: 700;
+    }}
+    h1 {{
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }}
+    @media (max-width: 680px) {{
+      body {{ padding: 12px; place-items: start center; }}
+      header, form, .message {{ padding: 18px; }}
+      .grid {{ grid-template-columns: 1fr; }}
+      .actions {{ flex-direction: column-reverse; }}
+      button {{ width: 100%; }}
+    }}
+  </style>
+</head>
+<body>
+  {body}
+</body>
+</html>"""
+
+
+wizard_body = """
+<main>
+  <header>
+    <div class="brand"><div class="mark">ODF</div><div><h1>OpnDF Kurulum</h1></div></div>
+    <div class="status">Tarayıcı sihirbazı</div>
+  </header>
+  <form id="setup-form">
+    <p class="intro">Bölüm, sınıf ve çalışma seçeneklerini seçin. Kurulum terminalde kaldığı yerden devam edecek.</p>
+    <div class="grid">
+      <label>Bölüm
+        <select id="department" required></select>
+      </label>
+      <label>Sınıf
+        <select id="grade" required></select>
+      </label>
+      <label id="section-label">Şube
+        <select id="section"></select>
+      </label>
+    </div>
+    <div class="toggles">
+      <label class="toggle">Oturum açıldığında otomatik çalışsın
+        <input id="autoStart" type="checkbox" />
+      </label>
+      <label class="toggle">Ders açıldığında bildirim göstersin
+        <input id="sendNotifications" type="checkbox" />
+      </label>
+    </div>
+    <div class="error" id="error" role="alert"></div>
+    <div class="actions">
+      <button class="secondary" id="cancel" type="button">Terminale dön</button>
+      <button type="submit">Kurulumu Başlat</button>
+    </div>
+  </form>
+</main>
+<script id="manifest-data" type="application/json">__MANIFEST__</script>
+<script id="defaults-data" type="application/json">__DEFAULTS__</script>
+<script>
+  const manifest = JSON.parse(document.getElementById("manifest-data").textContent);
+  const defaults = JSON.parse(document.getElementById("defaults-data").textContent);
+  const departmentSelect = document.getElementById("department");
+  const gradeSelect = document.getElementById("grade");
+  const sectionSelect = document.getElementById("section");
+  const sectionLabel = document.getElementById("section-label");
+  const autoStart = document.getElementById("autoStart");
+  const sendNotifications = document.getElementById("sendNotifications");
+  const errorBox = document.getElementById("error");
+
+  function addOption(select, value, label) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    select.appendChild(option);
+  }
+
+  function currentDepartment() {
+    return manifest.departments.find((item) => item.id === departmentSelect.value);
+  }
+
+  function currentGrade() {
+    const department = currentDepartment();
+    return department?.grades.find((item) => item.id === gradeSelect.value);
+  }
+
+  function fillDepartments() {
+    departmentSelect.textContent = "";
+    for (const department of manifest.departments || []) {
+      const name = department.name ? `${department.id} - ${department.name}` : department.id;
+      addOption(departmentSelect, department.id, name);
+    }
+    if (defaults.department) departmentSelect.value = defaults.department;
+    fillGrades();
+  }
+
+  function fillGrades() {
+    const department = currentDepartment();
+    gradeSelect.textContent = "";
+    for (const grade of department?.grades || []) {
+      addOption(gradeSelect, grade.id, `${grade.id}. sınıf`);
+    }
+    if (defaults.grade && [...gradeSelect.options].some((option) => option.value === defaults.grade)) {
+      gradeSelect.value = defaults.grade;
+    }
+    fillSections();
+  }
+
+  function fillSections() {
+    const grade = currentGrade();
+    const visibleSections = (grade?.sections || []).filter((section) => section.id);
+    sectionSelect.textContent = "";
+    if (visibleSections.length === 0) {
+      sectionLabel.style.display = "none";
+      addOption(sectionSelect, "", "Genel");
+      sectionSelect.value = "";
+      return;
+    }
+    sectionLabel.style.display = "grid";
+    for (const section of visibleSections) {
+      addOption(sectionSelect, section.id, section.name || section.id);
+    }
+    if (defaults.section && [...sectionSelect.options].some((option) => option.value === defaults.section)) {
+      sectionSelect.value = defaults.section;
+    }
+  }
+
+  departmentSelect.addEventListener("change", () => {
+    defaults.grade = "";
+    defaults.section = "";
+    fillGrades();
+  });
+  gradeSelect.addEventListener("change", () => {
+    defaults.section = "";
+    fillSections();
+  });
+
+  autoStart.checked = defaults.autoStart !== false;
+  sendNotifications.checked = defaults.sendNotifications !== false;
+  fillDepartments();
+
+  document.getElementById("cancel").addEventListener("click", async () => {
+    await fetch("/cancel", { method: "POST" });
+    document.body.innerHTML = "<main><header><div class='brand'><div class='mark'>ODF</div><h1>Terminale dönüldü</h1></div></header><div class='message'><p class='intro'>Kurulum terminal seçimleriyle devam edecek. Bu sekmeyi kapatabilirsiniz.</p></div></main>";
+  });
+
+  document.getElementById("setup-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    errorBox.textContent = "";
+    const payload = {
+      department: departmentSelect.value,
+      grade: gradeSelect.value,
+      section: sectionSelect.value,
+      autoStart: autoStart.checked,
+      sendNotifications: sendNotifications.checked
+    };
+    try {
+      const response = await fetch("/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      document.body.innerHTML = "<main><header><div class='brand'><div class='mark'>ODF</div><h1>Kurulum başladı</h1></div></header><div class='message'><p class='intro'>Seçimler alındı. Terminalde dosyalar hazırlanıyor; bu sekmeyi kapatabilirsiniz.</p></div></main>";
+    } catch (error) {
+      errorBox.textContent = error.message || "Seçimler kaydedilemedi.";
+    }
+  });
+</script>
+"""
+
+wizard_html = page(
+    "OpnDF Kurulum",
+    wizard_body
+    .replace("__MANIFEST__", json.dumps(manifest, ensure_ascii=False).replace("</", "<\\/"))
+    .replace("__DEFAULTS__", json.dumps(defaults, ensure_ascii=False).replace("</", "<\\/")),
+)
+
+success_html = page(
+    "OpnDF Kurulum Başladı",
+    "<main><header><div class='brand'><div class='mark'>ODF</div><h1>Kurulum başladı</h1></div></header><div class='message'><p class='intro'>Seçimler alındı. Terminalde dosyalar hazırlanıyor; bu sekmeyi kapatabilirsiniz.</p></div></main>",
+)
+
+
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, *_args):
+        return
+
+    def send_html(self, content, status=200):
+        body = content.encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        if self.path == "/favicon.ico":
+            self.send_response(204)
+            self.end_headers()
+            return
+        self.send_html(wizard_html)
+
+    def do_POST(self):
+        if self.path == "/cancel":
+            self.server.cancelled = True
+            self.send_html(success_html)
+            return
+
+        if self.path != "/submit":
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            payload = json.loads(self.rfile.read(length).decode("utf-8"))
+            write_result(payload)
+        except Exception as exc:
+            body = str(exc).encode("utf-8")
+            self.send_response(400)
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        self.server.done = True
+        self.send_html(success_html)
+
+
+try:
+    timeout_seconds = int(os.environ.get("OPNDF_WEB_TIMEOUT_SECONDS", "600"))
+except ValueError:
+    timeout_seconds = 600
+timeout_seconds = max(30, min(3600, timeout_seconds))
+
+server = HTTPServer(("127.0.0.1", 0), Handler)
+server.done = False
+server.cancelled = False
+server.timeout = 1
+url = f"http://127.0.0.1:{server.server_address[1]}/"
+
+print("", file=sys.stderr)
+print(f"OpnDF kurulum sihirbazı: {url}", file=sys.stderr)
+print("Tarayıcı açılmazsa bu adresi kopyalayıp açın.", file=sys.stderr)
+
+try:
+    webbrowser.open(url, new=2)
+except Exception:
+    pass
+
+deadline = time.time() + timeout_seconds
+while not server.done and not server.cancelled and time.time() < deadline:
+    server.handle_request()
+
+server.server_close()
+
+if server.done:
+    raise SystemExit(0)
+if server.cancelled:
+    print("Tarayıcı sihirbazı iptal edildi.", file=sys.stderr)
+    raise SystemExit(3)
+
+print("Tarayıcı sihirbazı zaman aşımına uğradı.", file=sys.stderr)
+raise SystemExit(2)
+PY
+  then
+    # shellcheck disable=SC1090
+    source "${result_file}"
+    rm -f "${result_file}"
+    return 0
+  fi
+
+  rm -f "${result_file}"
+  return 1
+}
+
 require_command() {
   local command_name="$1"
   local friendly_name="$2"
@@ -478,10 +998,16 @@ Kurulum bölüm, sınıf ve şube seçiminizi alacak; ders programını indirip 
   trap cleanup_manifest EXIT
   prepare_manifest "${MANIFEST_FILE}"
 
+  if should_use_web_wizard && [[ -z "${OPNDF_DEPARTMENT:-}" || -z "${OPNDF_GRADE:-}" || -z "${OPNDF_AUTO_START:-}" || -z "${OPNDF_SEND_NOTIFICATIONS:-}" ]]; then
+    if ! run_web_setup "${MANIFEST_FILE}"; then
+      ui_info "Tarayıcı sihirbazı tamamlanmadı; terminal seçimleriyle devam ediliyor."
+    fi
+  fi
+
   mapfile -t departments < <(manifest_query "${MANIFEST_FILE}" "departments")
   [[ "${#departments[@]}" -gt 0 ]] || die "Manifest içinde bölüm seçeneği bulunamadı."
 
-  DEPARTMENT="${OPNDF_DEPARTMENT:-}"
+  DEPARTMENT="${OPNDF_DEPARTMENT:-${DEPARTMENT:-}}"
   if [[ -z "${DEPARTMENT}" ]]; then
     DEPARTMENT="$(ui_choose "Bölüm Seçimi" "Bölümünüzü seçin:" "${departments[@]}")" || die "Kurulum iptal edildi."
   fi
@@ -491,37 +1017,35 @@ Kurulum bölüm, sınıf ve şube seçiminizi alacak; ders programını indirip 
   mapfile -t grades < <(manifest_query "${MANIFEST_FILE}" "grades" "${DEPARTMENT}")
   [[ "${#grades[@]}" -gt 0 ]] || die "${DEPARTMENT} bölümü için sınıf seçeneği bulunamadı."
 
-  GRADE="${OPNDF_GRADE:-}"
+  GRADE="${OPNDF_GRADE:-${GRADE:-}}"
   if [[ -z "${GRADE}" ]]; then
     GRADE="$(ui_choose "Sınıf Seçimi" "Sınıfınızı seçin:" "${grades[@]}")" || die "Kurulum iptal edildi."
   fi
 
   mapfile -t sections < <(manifest_query "${MANIFEST_FILE}" "sections" "${DEPARTMENT}" "${GRADE}")
-  SECTION="${OPNDF_SECTION:-}"
+  SECTION="${OPNDF_SECTION:-${SECTION:-}}"
   if [[ -z "${SECTION}" && "${#sections[@]}" -gt 0 ]]; then
     SECTION="$(ui_choose "Şube Seçimi" "Şubenizi seçin:" "${sections[@]}")" || die "Kurulum iptal edildi."
   fi
 
   SCHEDULE_REMOTE_PATH="$(manifest_query "${MANIFEST_FILE}" "schedule" "${DEPARTMENT}" "${GRADE}" "${SECTION}")"
 
-  if [[ -z "${OPNDF_AUTO_START:-}" ]]; then
+  AUTO_START="${OPNDF_AUTO_START:-${AUTO_START:-}}"
+  if [[ -z "${AUTO_START}" ]]; then
     if ui_yes_no "OpnDF oturum açıldığında otomatik çalışsın mı?"; then
       AUTO_START="true"
     else
       AUTO_START="false"
     fi
-  else
-    AUTO_START="${OPNDF_AUTO_START}"
   fi
 
-  if [[ -z "${OPNDF_SEND_NOTIFICATIONS:-}" ]]; then
+  SEND_NOTIFICATIONS="${OPNDF_SEND_NOTIFICATIONS:-${SEND_NOTIFICATIONS:-}}"
+  if [[ -z "${SEND_NOTIFICATIONS}" ]]; then
     if ui_yes_no "Ders açıldığında öğretmen selamlaması ve bilgi bildirimi gösterilsin mi?"; then
       SEND_NOTIFICATIONS="true"
     else
       SEND_NOTIFICATIONS="false"
     fi
-  else
-    SEND_NOTIFICATIONS="${OPNDF_SEND_NOTIFICATIONS}"
   fi
 
   mkdir -p "${APP_DIR}" "${BOOKS_DIR}"
