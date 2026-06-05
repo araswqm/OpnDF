@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "app": "OpnDF",
+  "school": "CEMIL MIDILLI MESLEKI VE TEKNIK ANADOLU LISESI",
+  "repository": {
+    "owner": "araswqm",
+    "name": "OpnDF",
+    "branch": "main"
+  },
+  "departments": [
+    {
+      "id": "YET",
+      "name": "Yenilenebilir Enerji Teknolojileri",
+      "grades": [
+        {
+          "id": "9",
+          "sections": [
+            {
+              "id": "A",
+              "schedule": "Schedules/YET/9/A/schedule.json"
+            },
+            {
+              "id": "B",
+              "schedule": "Schedules/YET/9/B/schedule.json"
+            }
+          ]
+        },
+        {
+          "id": "10",
+          "sections": [
+            {
+              "id": "",
+              "name": "Genel",
+              "schedule": "Schedules/YET/10/schedule.json"
+            }
+          ]
+        },
+        {
+          "id": "11",
+          "sections": [
+            {
+              "id": "",
+              "name": "Genel",
+              "schedule": "Schedules/YET/11/schedule.json"
+            }
+          ]
+        },
+        {
+          "id": "12",
+          "sections": [
+            {
+              "id": "",
+              "name": "Genel",
+              "schedule": "Schedules/YET/12/schedule.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "LOJ",
+      "name": "Lojistik",
+      "grades": [
+        {
+          "id": "9",
+          "sections": [
+            {
+              "id": "A",
+              "schedule": "Schedules/LOJ/9/A/schedule.json"
+            }
+          ]
+        },
+        {
+          "id": "10",
+          "sections": [
+            {
+              "id": "",
+              "name": "Genel",
+              "schedule": "Schedules/LOJ/10/schedule.json"
+            }
+          ]
+        },
+        {
+          "id": "11",
+          "sections": [
+            {
+              "id": "",
+              "name": "Genel",
+              "schedule": "Schedules/LOJ/11/schedule.json"
+            }
+          ]
+        },
+        {
+          "id": "12",
+          "sections": [
+            {
+              "id": "",
+              "name": "Genel",
+              "schedule": "Schedules/LOJ/12/schedule.json"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

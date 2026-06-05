@@ -1,0 +1,30 @@
+{
+  "okul": "CEMİL MİDİLLİ MESLEKİ VE TEKNİK ANADOLU LİSESİ",
+  "sinif": "12 YET",
+  "sinif_ogretmeni": "ŞENAY KAPUTOĞLU",
+  "ders_programi": {
+    "Perşembe": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Fotovoltaik Sistem Projeleri", "ogretmen": "Ali Çobanöz" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Fotovoltaik Sistem Projeleri", "ogretmen": "Ali Çobanöz" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Fotovoltaik Sistem Projeleri", "ogretmen": "Ali Çobanöz" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Fotovoltaik Sistem Projeleri", "ogretmen": "Ali Çobanöz" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "Fotovoltaik Sistem Projeleri", "ogretmen": "Ali Çobanöz" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Fotovoltaik Güç Sistemleri", "ogretmen": "Ali Çobanöz" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Fotovoltaik Güç Sistemleri", "ogretmen": "Ali Çobanöz" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "T.C. İnkılap Tarihi ve Atatürkçülük", "ogretmen": "Nazife Kutgunay Yıldırım" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "T.C. İnkılap Tarihi ve Atatürkçülük", "ogretmen": "Nazife Kutgunay Yıldırım" },
+      { "baslangic": "13:30", "bitis": "14:00", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" }
+    ],
+    "Cuma": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Din Kültürü", "ogretmen": "Zeynep Kılınç" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "İngilizce 2", "ogretmen": "Şenay Kaputoğlu" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "İngilizce 2", "ogretmen": "Şenay Kaputoğlu" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Rehberlik ve Yönlendirme", "ogretmen": "Şenay Kaputoğlu" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "Din Kültürü", "ogretmen": "Zeynep Kılınç" }
+    ]
+  }
+}

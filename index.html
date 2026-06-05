@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpnDF Kurulum</title>
+    <meta
+      name="description"
+      content="Pardus Etap için ders saatine göre PDF kitap açan OpnDF kurulum sayfası."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #5f6b7d;
+        --line: #d9e1ea;
+        --paper: #f7f9fc;
+        --white: #ffffff;
+        --teal: #0f766e;
+        --blue: #2563eb;
+        --amber: #c47b12;
+        --red: #b42318;
+        --shadow: 0 18px 45px rgba(23, 32, 51, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .topbar {
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(16px);
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+
+      .topbar-inner {
+        width: min(1120px, calc(100% - 32px));
+        height: 64px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+      }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: var(--ink);
+        color: var(--white);
+        font-size: 14px;
+        letter-spacing: 0;
+      }
+
+      .nav-link {
+        color: var(--muted);
+        font-size: 14px;
+        text-decoration: none;
+      }
+
+      main {
+        min-height: calc(100vh - 64px);
+      }
+
+      .hero {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 56px 0 32px;
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+        gap: 44px;
+        align-items: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--teal);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(42px, 7vw, 86px);
+        line-height: 0.94;
+        letter-spacing: 0;
+      }
+
+      .hero-copy {
+        margin: 22px 0 0;
+        max-width: 650px;
+        color: var(--muted);
+        font-size: 19px;
+        line-height: 1.55;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .button {
+        appearance: none;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 0 18px;
+        font: inherit;
+        font-weight: 750;
+        text-decoration: none;
+        transition:
+          transform 150ms ease,
+          border-color 150ms ease,
+          background 150ms ease;
+      }
+
+      .button:active {
+        transform: translateY(1px);
+      }
+
+      .button.primary {
+        background: var(--teal);
+        color: var(--white);
+      }
+
+      .button.secondary {
+        background: var(--white);
+        border-color: var(--line);
+        color: var(--ink);
+      }
+
+      .command {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: stretch;
+        max-width: 720px;
+      }
+
+      .command code {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        color: #213047;
+        font-size: 14px;
+      }
+
+      .copy-state {
+        min-height: 22px;
+        margin-top: 8px;
+        color: var(--teal);
+        font-size: 14px;
+      }
+
+      .preview {
+        margin: 0;
+        border: 1px solid #cfd9e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        background: var(--white);
+      }
+
+      .preview-bar {
+        height: 42px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        background: #ffffff;
+      }
+
+      .preview-title {
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .window-dots {
+        display: flex;
+        gap: 7px;
+      }
+
+      .window-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: block;
+      }
+
+      .window-dots span:nth-child(1) {
+        background: var(--red);
+      }
+
+      .window-dots span:nth-child(2) {
+        background: var(--amber);
+      }
+
+      .window-dots span:nth-child(3) {
+        background: var(--teal);
+      }
+
+      .preview-body {
+        padding: 20px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .status-row,
+      .lesson-row {
+        display: grid;
+        grid-template-columns: 86px minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 13px 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .status-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        background: #eefaf7;
+        border-color: #b9e7dc;
+      }
+
+      .time {
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+      }
+
+      .lesson-name {
+        min-width: 0;
+        font-weight: 800;
+      }
+
+      .teacher {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .badge {
+        min-width: 78px;
+        justify-self: end;
+        border-radius: 999px;
+        padding: 5px 10px;
+        color: var(--white);
+        background: var(--blue);
+        text-align: center;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .badge.next {
+        background: var(--amber);
+      }
+
+      .band {
+        border-top: 1px solid var(--line);
+        background: var(--white);
+      }
+
+      .section-inner {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 34px 0 44px;
+      }
+
+      h2 {
+        margin: 0 0 18px;
+        font-size: 26px;
+        letter-spacing: 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .info-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 18px;
+        background: #fbfcfe;
+      }
+
+      .info-card strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .info-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .paths {
+        display: grid;
+        gap: 10px;
+      }
+
+      .path-row {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .path-row:last-child {
+        border-bottom: 0;
+      }
+
+      .path-row span {
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .path-row code {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        color: #25324a;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 16px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 14px;
+      }
+
+      @media (max-width: 860px) {
+        .hero {
+          grid-template-columns: 1fr;
+          padding-top: 38px;
+          gap: 28px;
+        }
+
+        .preview {
+          order: -1;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .topbar-inner {
+          width: min(100% - 24px, 1120px);
+        }
+
+        .hero,
+        .section-inner {
+          width: min(100% - 24px, 1120px);
+        }
+
+        .actions,
+        .command {
+          grid-template-columns: 1fr;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        .status-row,
+        .lesson-row,
+        .path-row {
+          grid-template-columns: 1fr;
+        }
+
+        .badge {
+          justify-self: start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand" aria-label="OpnDF">
+          <div class="brand-mark" aria-hidden="true">ODF</div>
+          <span>OpnDF</span>
+        </div>
+        <a class="nav-link" href="https://github.com/araswqm/OpnDF">GitHub deposu</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Pardus Etap kitap açıcı</p>
+          <h1 id="page-title">OpnDF</h1>
+          <p class="hero-copy">
+            Bölüm, sınıf ve şube seçimini alır; ders programını ve kitap klasörünü
+            hazırlar. Oturum açıldığında o anki dersin PDF kitabını varsayılan
+            uygulamada açar.
+          </p>
+
+          <div class="actions">
+            <a class="button primary" href="install.sh" download>install.sh indir</a>
+            <a class="button secondary" href="Scripts/run.sh" download>run.sh indir</a>
+          </div>
+
+          <div class="command" aria-label="Kurulum komutu">
+            <code id="install-command">curl -fsSL https://araswqm.github.io/OpnDF/install.sh -o install.sh && bash install.sh</code>
+            <button class="button secondary" id="copy-command" type="button">Kopyala</button>
+          </div>
+          <div class="copy-state" id="copy-state" role="status" aria-live="polite"></div>
+        </div>
+
+        <figure class="preview" aria-label="OpnDF çalışma özeti">
+          <div class="preview-bar">
+            <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="preview-title">schedule.json</div>
+          </div>
+          <div class="preview-body">
+            <div class="status-row">
+              <div>
+                <div class="lesson-name">İyi dersler, Ayşe Demir!</div>
+                <div class="teacher">PDF varsayılan uygulamada açılıyor</div>
+              </div>
+              <div class="badge">Şimdi</div>
+            </div>
+            <div class="lesson-row">
+              <div class="time">08:15</div>
+              <div>
+                <div class="lesson-name">Matematik</div>
+                <div class="teacher">Mehmet Yılmaz</div>
+              </div>
+              <div class="badge">Açıldı</div>
+            </div>
+            <div class="lesson-row">
+              <div class="time">08:50</div>
+              <div>
+                <div class="lesson-name">Fizik</div>
+                <div class="teacher">Zeynep Kaya</div>
+              </div>
+              <div class="badge next">Sırada</div>
+            </div>
+          </div>
+        </figure>
+      </section>
+
+      <section class="band" aria-labelledby="setup-title">
+        <div class="section-inner">
+          <h2 id="setup-title">Kurulum Akışı</h2>
+          <div class="grid">
+            <article class="info-card">
+              <strong>Seçimler</strong>
+              <p>Kurulum bölüm, sınıf ve gerekiyorsa şube bilgisini GUI ile alır.</p>
+            </article>
+            <article class="info-card">
+              <strong>Program</strong>
+              <p>Seçilen sınıfın en güncel <code>schedule.json</code> dosyası indirilir.</p>
+            </article>
+            <article class="info-card">
+              <strong>Kitaplar</strong>
+              <p>PDF dosyaları varsa indirilir; eksikler <code>missing-pdfs.txt</code> içine yazılır.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="band" aria-labelledby="paths-title">
+        <div class="section-inner">
+          <h2 id="paths-title">Oluşturulan Konumlar</h2>
+          <div class="paths">
+            <div class="path-row">
+              <span>Program</span>
+              <code>/home/[kullanıcı]/OpnDF/</code>
+            </div>
+            <div class="path-row">
+              <span>Kitaplar</span>
+              <code>/home/[kullanıcı]/Masaüstü/OpnDF Kitaplar/</code>
+            </div>
+            <div class="path-row">
+              <span>Masaüstü</span>
+              <code>/home/[kullanıcı]/Masaüstü/OpnDF.autostart</code>
+            </div>
+            <div class="path-row">
+              <span>Otomatik başlatma</span>
+              <code>/home/[kullanıcı]/.config/autostart/OpnDF.autostart</code>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>OpnDF, Pardus Etap sınıflarında ders kitabını zamanında açmak için hazırlanmıştır.</footer>
+
+    <script>
+      const commandEl = document.querySelector("#install-command");
+      const copyButton = document.querySelector("#copy-command");
+      const copyState = document.querySelector("#copy-state");
+      const installUrl = new URL("install.sh", window.location.href).href;
+      const command = `curl -fsSL ${installUrl} -o install.sh && bash install.sh`;
+
+      commandEl.textContent = command;
+
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(command);
+          copyState.textContent = "Komut kopyalandı.";
+        } catch (error) {
+          copyState.textContent = "Kopyalama başarısız oldu; komutu elle seçebilirsiniz.";
+        }
+      });
+    </script>
+  </body>
+</html>

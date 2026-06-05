@@ -1,0 +1,29 @@
+{
+  "okul": "CEMİL MİDİLLİ MESLEKİ VE TEKNİK ANADOLU LİSESİ",
+  "sinif": "12 LOJ",
+  "sinif_ogretmeni": "NAZİFE KUTGUNAY YILDIRIM",
+  "ders_programi": {
+    "Pazartesi": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Din Kültürü", "ogretmen": "Zeynep Kılınç" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Afet Lojistiği", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Afet Lojistiği", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Rehberlik ve Yönlendirme", "ogretmen": "Nazife Kutgunay Yıldırım" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "Din Kültürü", "ogretmen": "Zeynep Kılınç" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "T.C. İnkılap Tarihi ve Atatürkçülük", "ogretmen": "Nazife Kutgunay Yıldırım" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "T.C. İnkılap Tarihi ve Atatürkçülük", "ogretmen": "Nazife Kutgunay Yıldırım" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" }
+    ],
+    "Salı": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Tuncay Arslan" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "İngilizce 2", "ogretmen": "Şenay Kaputoğlu" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "İngilizce 2", "ogretmen": "Şenay Kaputoğlu" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "E Ticaret Lojistik", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "E Ticaret Lojistik", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Afet Lojistiği", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "Fuar Lojistiği", "ogretmen": "Ümran İliş" }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "okul": "CEMİL MİDİLLİ MESLEKİ VE TEKNİK ANADOLU LİSESİ",
+  "sinif": "9 A LOJ",
+  "sinif_ogretmeni": "",
+  "ders_programi": {
+    "Pazartesi": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Kimya", "ogretmen": "Asuman Yoran" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Emel İçli" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Biyoloji", "ogretmen": "Sibel Ayaz Demirtaş" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Din Kültürü", "ogretmen": "Zeynep Kılınç" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "İngilizce", "ogretmen": "Elif Ünsal Ağbaş" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Ofis Uygulamaları", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Ofis Uygulamaları", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Ofis Uygulamaları", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "Ofis Uygulamaları", "ogretmen": "Hatice Gürdoğan" }
+    ],
+    "Salı": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Beden Eğitimi", "ogretmen": "Sevgi Altıncı" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Beden Eğitimi", "ogretmen": "Sevgi Altıncı" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Coğrafya", "ogretmen": "Özlem Akkuş" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Mesleki Gelişim Atölyesi", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "Mesleki Gelişim Atölyesi", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Tarih", "ogretmen": "Nazife Kutgunay Yıldırım" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Fizik", "ogretmen": "Asuman Yoran" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "İngilizce", "ogretmen": "Elif Ünsal Ağbaş" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "İngilizce", "ogretmen": "Elif Ünsal Ağbaş" }
+    ],
+    "Çarşamba": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Emel İçli" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Temel Ulaştırma", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Temel Ulaştırma", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Emel İçli" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "Kimya", "ogretmen": "Asuman Yoran" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Matematik 9", "ogretmen": "Saadet Cicikçioğlu" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Matematik 9", "ogretmen": "Saadet Cicikçioğlu" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Biyoloji", "ogretmen": "Sibel Ayaz Demirtaş" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "İngilizce", "ogretmen": "Elif Ünsal Ağbaş" }
+    ],
+    "Perşembe": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Temel Ulaştırma", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Temel Ulaştırma", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Temel Ulaştırma", "ogretmen": "Hatice Gürdoğan" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Emel İçli" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "Seçmeli Sanat Eğitimi", "ogretmen": "Nurdan Şehitoğlu - Mesut Şahin" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Seçmeli Sanat Eğitimi", "ogretmen": "Nurdan Şehitoğlu - Mesut Şahin" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Fizik", "ogretmen": "Asuman Yoran" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Coğrafya", "ogretmen": "Özlem Akkuş" },
+      { "baslangic": "12:55", "bitis": "13:24", "ders_adi": "Seçmeli Düşünme Eğitimi", "ogretmen": "Seval Buldağ" }
+    ],
+    "Cuma": [
+      { "baslangic": "08:15", "bitis": "08:45", "ders_adi": "Matematik 9", "ogretmen": "Saadet Cicikçioğlu" },
+      { "baslangic": "08:50", "bitis": "09:20", "ders_adi": "Matematik 9", "ogretmen": "Saadet Cicikçioğlu" },
+      { "baslangic": "09:25", "bitis": "09:55", "ders_adi": "Türk Dili ve Edebiyatı 9,11,12", "ogretmen": "Emel İçli" },
+      { "baslangic": "10:00", "bitis": "10:30", "ders_adi": "Seçmeli Düşünme Eğitimi", "ogretmen": "Seval Buldağ" },
+      { "baslangic": "10:35", "bitis": "11:05", "ders_adi": "Matematik 9", "ogretmen": "Saadet Cicikçioğlu" },
+      { "baslangic": "11:10", "bitis": "11:40", "ders_adi": "Seçmeli Temel Dini Bilgiler", "ogretmen": "Zeynep Kılınç" },
+      { "baslangic": "11:45", "bitis": "12:15", "ders_adi": "Din Kültürü", "ogretmen": "Zeynep Kılınç" },
+      { "baslangic": "12:20", "bitis": "12:50", "ders_adi": "Tarih", "ogretmen": "Nazife Kutgunay Yıldırım" }
+    ]
+  }
+}
