@@ -6,6 +6,7 @@ REPO_OWNER="${OPNDF_REPO_OWNER:-araswqm}"
 REPO_NAME="${OPNDF_REPO_NAME:-OpnDF}"
 REPO_BRANCH="${OPNDF_REPO_BRANCH:-main}"
 RAW_BASE="${OPNDF_RAW_BASE:-https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}}"
+MEDIA_BASE="${OPNDF_MEDIA_BASE:-https://media.githubusercontent.com/media/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 APP_DIR="${OPNDF_APP_DIR:-${HOME}/OpnDF}"
@@ -675,17 +676,59 @@ raw_url_for() {
   printf '%s/%s\n' "${RAW_BASE%/}" "$(urlencode_path "${remote_path}")"
 }
 
-download_to() {
+media_url_for() {
   local remote_path="$1"
+  printf '%s/%s\n' "${MEDIA_BASE%/}" "$(urlencode_path "${remote_path}")"
+}
+
+is_lfs_pointer() {
+  local file_path="$1"
+  [[ -f "${file_path}" ]] || return 1
+  LC_ALL=C head -c 64 "${file_path}" 2>/dev/null | grep -q '^version https://git-lfs.github.com/spec/v1'
+}
+
+is_pdf_file() {
+  local file_path="$1"
+  [[ -f "${file_path}" ]] || return 1
+  LC_ALL=C head -c 5 "${file_path}" 2>/dev/null | grep -q '^%PDF-'
+}
+
+download_url_to() {
+  local url="$1"
   local destination="$2"
-  local url
-  url="$(raw_url_for "${remote_path}")"
 
   if command -v curl >/dev/null 2>&1; then
     curl -fsSL --connect-timeout 20 --retry 2 "${url}" -o "${destination}"
   else
     wget -q --timeout=20 --tries=2 "${url}" -O "${destination}"
   fi
+}
+
+download_to() {
+  local remote_path="$1"
+  local destination="$2"
+  local raw_url=""
+  local media_url=""
+  local url=""
+  local urls=()
+
+  raw_url="$(raw_url_for "${remote_path}")"
+  media_url="$(media_url_for "${remote_path}")"
+  urls+=("${raw_url}")
+  [[ "${media_url}" != "${raw_url}" ]] && urls+=("${media_url}")
+
+  for url in "${urls[@]}"; do
+    rm -f "${destination}"
+    if download_url_to "${url}" "${destination}" && [[ -f "${destination}" ]]; then
+      if is_lfs_pointer "${destination}"; then
+        continue
+      fi
+      return 0
+    fi
+  done
+
+  rm -f "${destination}"
+  return 1
 }
 
 validate_json() {
@@ -884,7 +927,10 @@ try_download_pdf() {
   local candidates=()
   local remote_path=""
 
-  [[ -f "${destination}" ]] && return 0
+  if [[ -f "${destination}" ]]; then
+    is_pdf_file "${destination}" && return 0
+    rm -f "${destination}"
+  fi
 
   if [[ -n "${SECTION}" ]]; then
     candidates+=("PDF's/${DEPARTMENT}/${GRADE}/${SECTION}/${subject}.pdf")
@@ -897,7 +943,7 @@ try_download_pdf() {
 
   for remote_path in "${candidates[@]}"; do
     rm -f "${tmp}"
-    if download_to "${remote_path}" "${tmp}" 2>/dev/null && [[ -f "${tmp}" ]]; then
+    if download_to "${remote_path}" "${tmp}" 2>/dev/null && is_pdf_file "${tmp}"; then
       mv "${tmp}" "${destination}"
       return 0
     fi
@@ -905,6 +951,54 @@ try_download_pdf() {
 
   rm -f "${tmp}"
   return 1
+}
+
+PROGRESS_ACTIVE="false"
+
+start_pdf_progress() {
+  local total="$1"
+
+  case "${UI_BACKEND}" in
+    zenity)
+      exec 8> >(zenity --progress --title="${APP_NAME} Kurulum" --width=520 --auto-close --percentage=0 --text="Kitaplar hazırlanıyor..." >/dev/null 2>&1 || true)
+      PROGRESS_ACTIVE="true"
+      ;;
+    yad)
+      exec 8> >(yad --progress --title="${APP_NAME} Kurulum" --width=520 --auto-close --percentage=0 --text="Kitaplar hazırlanıyor..." >/dev/null 2>&1 || true)
+      PROGRESS_ACTIVE="true"
+      ;;
+    *)
+      PROGRESS_ACTIVE="false"
+      printf '\nKitaplar hazırlanıyor (0/%s)\n' "${total}" >&2 || true
+      ;;
+  esac
+}
+
+update_pdf_progress() {
+  local current="$1"
+  local total="$2"
+  local message="$3"
+  local percent=0
+
+  if [[ "${total}" -gt 0 ]]; then
+    percent=$((current * 100 / total))
+  fi
+
+  if [[ "${PROGRESS_ACTIVE}" == "true" ]]; then
+    printf '%s\n# %s\n' "${percent}" "${message}" >&8 || true
+  else
+    printf '\r[%3d%%] %s' "${percent}" "${message}" >&2 || true
+  fi
+}
+
+finish_pdf_progress() {
+  if [[ "${PROGRESS_ACTIVE}" == "true" ]]; then
+    printf '100\n' >&8 || true
+    exec 8>&-
+  else
+    printf '\n' >&2 || true
+  fi
+  PROGRESS_ACTIVE="false"
 }
 
 write_preferences() {
@@ -930,9 +1024,11 @@ write_preferences() {
     write_pref "REPO_NAME" "${REPO_NAME}"
     write_pref "REPO_BRANCH" "${REPO_BRANCH}"
     write_pref "RAW_BASE" "${RAW_BASE}"
+    write_pref "MEDIA_BASE" "${MEDIA_BASE}"
     write_pref "AUTO_START" "${AUTO_START}"
     write_pref "SEND_NOTIFICATIONS" "${SEND_NOTIFICATIONS}"
     write_pref "OPEN_TEACHER_GREETING" "true"
+    write_pref "OPEN_STATUS_WINDOW" "true"
     write_pref "CHECK_INTERVAL_SECONDS" "30"
     write_pref "INSTALLED_AT" "${installed_at}"
   } > "${tmp}"
@@ -1069,17 +1165,26 @@ ${BOOKS_DIR}"
   local downloaded_count=0
   local existing_count=0
   local missing_count=0
+  local total_subjects="${#subjects[@]}"
+  local current_subject=0
   local subject=""
+  start_pdf_progress "${total_subjects}"
   for subject in "${subjects[@]}"; do
-    if [[ -f "${BOOKS_DIR}/${subject}.pdf" ]]; then
+    current_subject=$((current_subject + 1))
+    update_pdf_progress "$((current_subject - 1))" "${total_subjects}" "${subject}.pdf hazırlanıyor..."
+    if [[ -f "${BOOKS_DIR}/${subject}.pdf" ]] && is_pdf_file "${BOOKS_DIR}/${subject}.pdf"; then
       existing_count=$((existing_count + 1))
+      update_pdf_progress "${current_subject}" "${total_subjects}" "${subject}.pdf hazır"
     elif try_download_pdf "${subject}"; then
       downloaded_count=$((downloaded_count + 1))
+      update_pdf_progress "${current_subject}" "${total_subjects}" "${subject}.pdf indirildi"
     else
       printf '%s.pdf\n' "${subject}" >> "${MISSING_PDFS_FILE}"
       missing_count=$((missing_count + 1))
+      update_pdf_progress "${current_subject}" "${total_subjects}" "${subject}.pdf bulunamadı"
     fi
   done
+  finish_pdf_progress
 
   local section_text="${SECTION}"
   [[ -n "${section_text}" ]] || section_text="Genel"

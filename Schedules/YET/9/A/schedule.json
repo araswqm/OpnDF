@@ -59,6 +59,9 @@
     ],
     "Cumartesi": [
       { "baslangic": "00:00", "bitis": "23:59", "ders_adi": "Atölye", "ogretmen": "Test Öğretmeni" }
+    ],
+    "Pazar": [
+      { "baslangic": "00:00", "bitis": "23:59", "ders_adi": "Atölye", "ogretmen": "Test Öğretmeni" }
     ]
   }
 }
